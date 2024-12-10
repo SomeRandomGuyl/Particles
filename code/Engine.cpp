@@ -19,7 +19,7 @@ Engine::run()
     p.unitTests();
     cout << "Unit tests complete.  Starting engine..." << endl;
 
-    while (m_window.isOpen())
+    while (m_Window.isOpen())
     {
         sf::Clock::restart();
         sf::Time dt = sf::seconds(0.1f);
@@ -79,5 +79,12 @@ Engine::update(float dtAsSeconds)
 
 Engine::draw()
 {
-    
+    m_Window.clear();
+
+    for(int i = 0; i < m_particles.size(); i++)
+    {
+        m_Window.draw(i);
+    }
+
+    m_Window.display();
 }
