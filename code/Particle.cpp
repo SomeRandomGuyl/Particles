@@ -1,6 +1,62 @@
 #include "Particle.h"
 
 
+Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition) : m_A(2, numPoints) {
+    m_ttl = TTL;
+    m_numPoints = numPoints;
+
+    m_radiansPerSec = M_PI * ((float)rand() % (RAND_MAX));
+
+    int sign = -1 * (rand() % 2);
+    m_vx = sign * (rand() % 400 + 100);
+    sign = -1 * (rand() % 2);
+    m_vy = sign * (rand() % 400 + 100);
+
+
+    int channelR = rand() % 256,
+        channelG = rand() % 256,
+        channelB = rand() % 256;
+    m_color1 = Color(channelR, channelG, channelB);
+
+    channelR = rand() % 256;
+    channelG = rand() % 256;
+    channelB = rand() % 256;
+    m_color2 = Color(channelR, channelG, channelB);
+
+
+
+    // RANDOM POINT GENERATION LET'S GOOOOOOOOOO
+    double theta = (float)rand % (M_PI / 2); // guhh.
+    double dTheta = 2 * M_PI / (numPoints - 1);
+
+    for (int j = 0; j < numPoints; j++) {
+        int r;
+        double dx, dy;
+
+        r = rand() % 60 + 20;
+        dx = r * cos(theta)
+        dy = r * sin(theta)
+
+            //Assign the Cartesian coordinate of the newly generated vertex to m_A :
+            m_A(0, j) = m_centerCoordinate.x + dx;
+        m_A(1, j) = m_centerCoordinate.y + dy;
+
+        theta += dTheta;
+    }
+}
+
+
+
+draw(RenderTarget& target, RenderStates states) const {
+}
+
+
+
+
+
+
+
+
 bool Particle::almostEqual(double a, double b, double eps)
 {
 	return fabs(a - b) < eps;
