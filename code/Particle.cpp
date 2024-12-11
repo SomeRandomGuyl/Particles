@@ -47,18 +47,22 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
 
 
-virtual void Particle::draw(RenderTarget& target, RenderStates states) const override {
-    VertexArray lines(/*triangleFan name*/, numPoints + 1);
+void Particle::draw(RenderTarget& target, RenderStates states) const {
+
+    // convert m_A to pixel coords in a VertexArray of type TriangleFan
+
+
+    VertexArray lines(/*triangleFan name*/, m_numPoints + 1);
 
     // need to map
     Vector2f center{ m_centerCoordinate.x, m_centerCoordinate.y };
 
     lines[0].position = center;
-    lines[0].color = m_color;
+    lines[0].color = m_color1;
 
     for (int j = 1; j <= m_numPoints; j++) {
-        lines[j].position = m_a(/*row?*/, j - 1);
-        lines[j].color = m_Color2;
+        lines[j].position = m_A(/*row?*/, j - 1);
+        lines[j].color = m_color2;
     }
     target.draw(lines);
 }
