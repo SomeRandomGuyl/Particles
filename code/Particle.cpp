@@ -26,7 +26,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
 
     // RANDOM POINT GENERATION LET'S GOOOOOOOOOO
-    double theta = (float)rand % (M_PI / 2); // guhh.
+    double theta = (float)rand() % (M_PI / 2); // guhh.
     double dTheta = 2 * M_PI / (numPoints - 1);
 
     for (int j = 0; j < numPoints; j++) {
