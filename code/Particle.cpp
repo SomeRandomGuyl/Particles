@@ -1,7 +1,7 @@
 #include "Particle.h"
 
 
-Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition) : m_A(2, numPoints) {
+Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition) : m_A(2, numPoints) {
     m_ttl = TTL;
     m_numPoints = numPoints;
 
@@ -48,6 +48,19 @@ Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosition) : m_A
 
 
 virtual void Particle::draw(RenderTarget& target, RenderStates states) const override {
+    VertexArray lines(/*triangleFan name*/, numPoints + 1);
+
+    // need to map
+    Vector2f center{ m_centerCoordinate.x, m_centerCoordinate.y };
+
+    lines[0].position = center;
+    lines[0].color = m_color;
+
+    for (int j = 1; j <= m_numPoints; j++) {
+        lines[j].position = m_a(/*row?*/, j - 1);
+        lines[j].color = m_Color2;
+    }
+    target.draw(lines);
 }
 
 
