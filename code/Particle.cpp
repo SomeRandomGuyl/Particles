@@ -5,7 +5,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
     m_ttl = TTL;
     m_numPoints = numPoints;
 
-    m_radiansPerSec = M_PI * ((float)rand() % (RAND_MAX));
+    m_radiansPerSec = M_PI * ((float)rand() / (RAND_MAX));
 
     int sign = -1 * (rand() % 2);
     m_vx = sign * (rand() % 400 + 100);
@@ -26,7 +26,7 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
 
     // RANDOM POINT GENERATION LET'S GOOOOOOOOOO
-    double theta = (float)rand() % (M_PI / 2); // guhh.
+    double theta = M_PI * 0.5 * ((float)rand() / (RAND_MAX)); // guhh.
     double dTheta = 2 * M_PI / (numPoints - 1);
 
     for (int j = 0; j < numPoints; j++) {
@@ -34,8 +34,8 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
         double dx, dy;
 
         r = rand() % 60 + 20;
-        dx = r * cos(theta)
-        dy = r * sin(theta)
+        dx = r * cos(theta);
+        dy = r * sin(theta);
 
             //Assign the Cartesian coordinate of the newly generated vertex to m_A :
             m_A(0, j) = m_centerCoordinate.x + dx;
