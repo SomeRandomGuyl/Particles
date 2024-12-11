@@ -24,9 +24,9 @@ Engine::run()
         sf::Clock::restart();
         sf::Time dt = sf::seconds(0.1f);
 
-        input();
-        update();
-        draw();
+        p.input();
+        p.update(dt);
+        p.draw();
     }
 }
 
@@ -67,7 +67,7 @@ Engine::update(float dtAsSeconds)
     {
         if (getTTL() > 0.0)
         {
-            update(dt);
+            p.update(dt);
             ++i
         }
         else
