@@ -7,10 +7,19 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
     m_radiansPerSec = M_PI * ((float)rand() / (RAND_MAX));
 
+
+    // 12/14
+    m_cartesianPlane.setCenter(0, 0);
+    m_cartesianPlane.setSize(target.getSize().x, (-1.0) * target.getSize().y);
+    m_centerCoordinate = target.mapPixelToCoords(mouseClickPosition, m_cartesianPlane);
+    //cout << "DEBUG: Particle constructor: m_CenterCoord = " << m_centerCoordinate.x << ", " << m_centerCoordinate.y << endl;
+
+
+
     int sign = -1 * (rand() % 2);
     m_vx = sign * (rand() % 400 + 100);
     sign = -1 * (rand() % 2);
-    m_vy = sign * (rand() % 400 + 100);
+    m_vy = 200 + sign * (rand() % 400 + 100);
 
 
     int channelR = rand() % 256,
@@ -37,8 +46,8 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
         dx = r * cos(theta);
         dy = r * sin(theta);
 
-            //Assign the Cartesian coordinate of the newly generated vertex to m_A :
-            m_A(0, j) = m_centerCoordinate.x + dx;
+        //Assign the Cartesian coordinate of the newly generated vertex to m_A :
+        m_A(0, j) = m_centerCoordinate.x + dx;
         m_A(1, j) = m_centerCoordinate.y + dy;
 
         theta += dTheta;
@@ -49,19 +58,35 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
 
 void Particle::draw(RenderTarget& target, RenderStates states) const {
 
+    // 12/14
     // convert m_A to pixel coords in a VertexArray of type TriangleFan
+        // implementation here is a total guess
+    //VertexArray burst(TriangleFan, m_numPoints+1);
+    /*
+    for (int i = 0; i < m_numPoints; i++) {
+        Vector2f t1 = { (float)m_A(0, i), (float)m_A(1, i) };
+        Vector2i temp(target.mapCoordsToPixel(t1, m_cartesianPlane));
+        Vector2f t2 = { (float)temp.x, (float)temp.y };
+        burst[i] = Vertex(t2);
+    }
+    */
 
 
-    VertexArray lines(/*triangleFan name*/, m_numPoints + 1);
+    VertexArray lines(TriangleFan, m_numPoints + 1);
 
-    // need to map
-    Vector2f center{ m_centerCoordinate.x, m_centerCoordinate.y };
+    // mapped?
+    Vector2f center{ target.mapCoordsToPixel(m_centerCoordinate, m_cartesianPlane) };
+    //cout << "DEBUG: Particle draw: center before mapping = " << m_centerCoordinate.x << ", " << m_centerCoordinate.y << endl;
+    //cout << "DEBUG: Particle draw: center after  mapping = " << center.x << ", " << center.y << endl << endl;
 
     lines[0].position = center;
     lines[0].color = m_color1;
 
     for (int j = 1; j <= m_numPoints; j++) {
-        lines[j].position = m_A(/*row?*/, j - 1);
+        double x = m_A(0, j - 1);
+        double y = m_A(1, j - 1);
+        lines[j].position.x = target.mapCoordsToPixel(Vector2f(x,y), m_cartesianPlane).x;
+        lines[j].position.y = target.mapCoordsToPixel(Vector2f(x,y), m_cartesianPlane).y;
         lines[j].color = m_color2;
     }
     target.draw(lines);
@@ -71,7 +96,7 @@ void Particle::draw(RenderTarget& target, RenderStates states) const {
 
 void Particle::update(float dt) {
     m_ttl -= dt;
-    rotate(dr * radiansPerSec);
+    rotate(dt * m_radiansPerSec);
     scale(SCALE);
 
     float dx, dy;
@@ -84,10 +109,30 @@ void Particle::update(float dt) {
 
 
 void Particle::translate(double xShift, double yShift) {
-    TranslationMatrix T(xShift, yShift, /*nCols*/);
+    //cout << "DEBUG: Translate: m_numPoints = " << m_numPoints << endl;
+    TranslationMatrix T(xShift, yShift, m_numPoints);       // third argument could be wrong
     m_A = T + m_A;
-    m_centerCoordinate.x = xShift;
-    m_centerCoordinate.y = yShift;
+
+    /*
+    cout << "m_A as seen by translate():" << endl;
+    for (int rA = 0; rA < m_A.getRows(); rA++) {
+        for (int cA = 0; cA < m_A.getCols(); cA++) {
+            cout << "[" << m_A(rA, cA) << "]";
+        }
+        cout << endl;
+    }
+
+    cout << "T as seen by translate():" << endl;
+    for (int rT = 0; rT < T.getRows(); rT++) {
+        for (int cT = 0; cT < T.getCols(); cT++) {
+            cout << "[" << T(rT, cT) << "]";
+        }
+        cout << endl;
+    }
+    */
+
+    m_centerCoordinate.x += xShift;
+    m_centerCoordinate.y += yShift;
 }
 
 void Particle::rotate(double theta) {
