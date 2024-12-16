@@ -9,7 +9,7 @@ Engine::Engine()
     m_Window.create(VideoMode(resolution.x, resolution.y), "Particles!", Style::Fullscreen);
 }
 
-Engine::run()
+void Engine::run()
 {
     sf::Clock clock;
     sf::Time dt = clock.getElapsedTime();
@@ -21,18 +21,18 @@ Engine::run()
 
     while (m_Window.isOpen())
     {
-        sf::Clock::restart();
-        sf::Time dt = sf::seconds(0.1f);
+        dt = clock.restart();
+        float seconds = dt.asSeconds();
+        
 
-        p.input();
-        p.update(dt);
-        p.draw();
+        input();
+        update(seconds);
+        draw();
     }
 }
 
-Engine::input()
+void Engine::input()
 {
-    vector<Vector2i> mouseClicks;
     Event event;
     while (m_Window.pollEvent(event))
     {
@@ -48,27 +48,28 @@ Engine::input()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                mouseClicks.push_back(Vector2i(event.mouseButton.x))
                 for (int i = 0; i < 5; i++)
                 {
+                    Vector2i mouseClicks = {event.mouseButton.x, event.mouseButton.y};
                     int nPoints = rand()%25 + 25;
-                    mouseClicks.push_back(Particle(m_Window, nPoints, mouseClicks[i]))
+                    m_particles.push_back(Particle(m_Window, nPoints, mouseClicks));
                 }
             }
         }
     }
 }
 
-Engine::update(float dtAsSeconds)
+void Engine::update(float dtAsSeconds)
 {
-    vector<int>::iterator i = m_particles.begin();
+    vector<Particle>::iterator i = m_particles.begin();
 
-    for(i != m_particles.end())
+    while(i != m_particles.end())
+    //for (int i = 0; i < m_particles.size();)
     {
-        if (getTTL() > 0.0)
+        if (i->getTTL() > 0.0)
         {
-            p.update(dt);
-            ++i
+            i->update(dtAsSeconds);
+            ++i;
         }
         else
         {
@@ -77,13 +78,13 @@ Engine::update(float dtAsSeconds)
     }
 }
 
-Engine::draw()
+void Engine::draw()
 {
     m_Window.clear();
 
     for(int i = 0; i < m_particles.size(); i++)
     {
-        m_Window.draw(i);
+        m_Window.draw(m_particles[i]);
     }
 
     m_Window.display();
